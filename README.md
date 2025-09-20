@@ -161,7 +161,8 @@ intellinvest-hub-main/
 ### 📦 Investment Products Endpoints
 
 | Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
+|--------|----------|-------------|-----------
+----|
 | `GET` | `/api/products` | Get all investment products | ❌ |
 | `GET` | `/api/products/:id` | Get product by ID | ❌ |
 | `GET` | `/api/products/ai/recommendations` | Get AI recommendations | ✅ |
