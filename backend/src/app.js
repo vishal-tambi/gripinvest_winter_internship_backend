@@ -5,6 +5,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 const { connectDB } = require('./config/database');
+// Import models to ensure they are registered
+require('./models');
 // const { logTransaction } = require('./middleware/logging');
 
 // Import routes
