@@ -66,25 +66,181 @@ Visit `http://localhost:8080` for frontend and `http://localhost:3001` for backe
 ## 📁 Project Structure
 
 ```
-IntelliInvest-Hub/
-├── backend/
+intellinvest-hub-main/
+├── 📁 backend/                          # Node.js API Server
 │   ├── src/
-│   │   ├── controllers/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── middleware/
-│   │   └── utils/
-│   ├── config/
-│   └── package.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   ├── store/
-│   │   └── utils/
-│   └── package.json
-└── README.md
+│   │   ├── controllers/                 # API route handlers
+│   │   │   ├── authController.js        # Authentication logic
+│   │   │   ├── investmentController.js  # Investment operations
+│   │   │   ├── productController.js     # Product management
+│   │   │   ├── userController.js        # User profile management
+│   │   │   └── logController.js         # Transaction logging
+│   │   ├── models/                      # Database models (Sequelize)
+│   │   │   ├── User.js                  # User model with auth
+│   │   │   ├── InvestmentProduct.js     # Investment products
+│   │   │   ├── Investment.js            # User investments
+│   │   │   ├── TransactionLog.js        # Audit logs
+│   │   │   └── index.js                 # Model associations
+│   │   ├── routes/                      # API routes
+│   │   │   ├── auth.js                  # Auth endpoints
+│   │   │   ├── products.js              # Product endpoints
+│   │   │   ├── investments.js           # Investment endpoints
+│   │   │   ├── users.js                 # User endpoints
+│   │   │   └── logs.js                  # Logging endpoints
+│   │   ├── middleware/                  # Express middleware
+│   │   │   ├── auth.js                  # JWT verification
+│   │   │   └── logging.js               # Request logging
+│   │   ├── services/                    # Business logic
+│   │   │   ├── aiService.js             # Google AI integration
+│   │   │   └── emailService.js          # Email functionality
+│   │   ├── config/                      # Configuration
+│   │   │   └── database.js              # DB connection & config
+│   │   ├── utils/                       # Utility functions
+│   │   │   └── validation.js            # Input validation
+│   │   └── app.js                       # Express app setup
+│   ├── scripts/                         # Database scripts
+│   │   └── seed.js                      # Database seeding
+│   ├── package.json                     # Backend dependencies
+│   └── .env.example                     # Environment template
+├── 📁 src/                              # React Frontend
+│   ├── components/                      # React components
+│   │   ├── ui/                          # shadcn/ui components
+│   │   ├── auth/                        # Authentication components
+│   │   ├── dashboard/                   # Dashboard components
+│   │   └── layout/                      # Layout components
+│   ├── pages/                           # Route pages
+│   │   ├── Auth.tsx                     # Login/Signup page
+│   │   ├── Dashboard.tsx                # Main dashboard
+│   │   ├── Products.tsx                 # Investment products
+│   │   ├── Investments.tsx              # Portfolio page
+│   │   ├── Transactions.tsx             # Transaction history
+│   │   ├── Profile.tsx                  # User profile
+│   │   ├── Index.tsx                    # Landing page
+│   │   └── NotFound.tsx                 # 404 page
+│   ├── store/                           # State management
+│   │   └── authStore.ts                 # Zustand auth store
+│   ├── hooks/                           # Custom React hooks
+│   │   ├── use-toast.ts                 # Toast notifications
+│   │   └── use-mobile.tsx               # Mobile detection
+│   ├── lib/                             # Utility libraries
+│   │   ├── api.ts                       # API client setup
+│   │   ├── ai.ts                        # AI integration
+│   │   └── utils.ts                     # Helper functions
+│   ├── types/                           # TypeScript types
+│   │   └── index.ts                     # Type definitions
+│   ├── App.tsx                          # Main App component
+│   └── main.tsx                         # React entry point
+├── 📁 public/                           # Static assets
+├── 📁 dist/                             # Build output
+├── 📄 package.json                      # Frontend dependencies
+├── 📄 tailwind.config.ts                # Tailwind configuration
+├── 📄 vite.config.ts                    # Vite configuration
+├── 📄 components.json                   # shadcn/ui config
+├── 📄 IntelliInvest-Hub-API.postman_collection.json  # API collection
+├── 📄 CLAUDE.md                         # AI assistant guidance
+└── 📄 README.md                         # Project documentation
+```
+
+## 🔌 API Documentation
+
+### Base URL
+- **Production**: `https://gripinvest-winter-internship-backend.onrender.com`
+- **Development**: `http://localhost:3001`
+
+### 🔐 Authentication Endpoints
+
+| Method | Endpoint | Description | Body Parameters |
+|--------|----------|-------------|-----------------|
+| `POST` | `/api/auth/signup` | Register new user | `first_name, last_name, email, password, risk_appetite` |
+| `POST` | `/api/auth/login` | User login | `email, password` |
+| `GET` | `/api/auth/me` | Get current user | **Requires Auth** |
+| `POST` | `/api/auth/forgot-password` | Request password reset | `email` |
+| `POST` | `/api/auth/reset-password` | Reset password | `token, password` |
+| `POST` | `/api/auth/analyze-password` | AI password analysis | `password` |
+
+### 📦 Investment Products Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/products` | Get all investment products | ❌ |
+| `GET` | `/api/products/:id` | Get product by ID | ❌ |
+| `GET` | `/api/products/ai/recommendations` | Get AI recommendations | ✅ |
+| `POST` | `/api/products` | Create product (Admin) | ✅ |
+| `PUT` | `/api/products/:id` | Update product (Admin) | ✅ |
+| `DELETE` | `/api/products/:id` | Delete product (Admin) | ✅ |
+
+### 💰 Investment Management Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/investments/portfolio` | Get user portfolio | ✅ |
+| `GET` | `/api/investments/portfolio/summary` | Get portfolio summary | ✅ |
+| `GET` | `/api/investments/portfolio/insights` | Get AI portfolio insights | ✅ |
+| `POST` | `/api/investments` | Create new investment | ✅ |
+| `GET` | `/api/investments/:id` | Get investment details | ✅ |
+| `PUT` | `/api/investments/:id/cancel` | Cancel investment | ✅ |
+
+### 👤 User Profile Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/user/profile` | Get user profile | ✅ |
+| `PUT` | `/api/user/profile` | Update profile | ✅ |
+| `PUT` | `/api/user/risk-appetite` | Update risk appetite | ✅ |
+
+### 📊 Transaction Logs Endpoints
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/logs` | Get transaction logs | ✅ |
+| `GET` | `/api/logs/error-summary` | Get error summary | ✅ |
+
+### 🏥 Health Check Endpoints
+
+| Method | Endpoint | Description | Response |
+|--------|----------|-------------|----------|
+| `GET` | `/api/health` | API & DB status | `{status: 'healthy', database: 'connected'}` |
+| `GET` | `/` | API information | `{message: 'Investment Platform API', version: '1.0.0'}` |
+
+### 🔑 Authentication Headers
+For protected endpoints, include JWT token in request header:
+```
+Authorization: Bearer <your-jwt-token>
+```
+
+### 📝 Request/Response Examples
+
+#### Signup Request
+```json
+POST /api/auth/signup
+{
+  "first_name": "John",
+  "last_name": "Doe",
+  "email": "john@example.com",
+  "password": "SecurePass123!",
+  "risk_appetite": "moderate"
+}
+```
+
+#### Create Investment Request
+```json
+POST /api/investments
+{
+  "product_id": "uuid-here",
+  "amount": 50000
+}
+```
+
+#### Portfolio Response
+```json
+{
+  "success": true,
+  "data": {
+    "investments": [...],
+    "total_value": 150000,
+    "total_returns": 15000
+  }
+}
 ```
 
 ## 🔧 Environment Variables
