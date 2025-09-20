@@ -5,7 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 
 const { connectDB } = require('./config/database');
-const { logTransaction } = require('./middleware/logging');
+// const { logTransaction } = require('./middleware/logging');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Logging middleware
-app.use(logTransaction);
+// app.use(logTransaction);
 
 // Health check
 app.get('/api/health', async (req, res) => {
