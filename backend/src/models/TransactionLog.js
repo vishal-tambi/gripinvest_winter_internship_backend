@@ -31,7 +31,7 @@ const TransactionLog = sequelize.define('TransactionLog', {
     }
   },
   http_method: {
-    type: DataTypes.ENUM('GET', 'POST', 'PUT', 'DELETE'),
+    type: DataTypes.ENUM('GET', 'POST', 'PUT', 'DELETE', 'HEAD'),
     allowNull: false,
     validate: {
       isIn: {
