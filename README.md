@@ -43,6 +43,9 @@ A full-stack investment platform enabling users to browse, invest in, and manage
 
 <img width="1919" height="910" alt="Screenshot 2025-09-30 175246" src="https://github.com/user-attachments/assets/cae0a9f1-6d8d-48f3-810a-a08eeca81d2d" />
 
+<img width="1919" height="920" alt="Screenshot 2025-09-30 175221" src="https://github.com/user-attachments/assets/a9a7b155-9022-43e9-976e-da93ac19ec39" />
+
+
 
 ## ⚡ Quick Start
 
