@@ -35,8 +35,8 @@ const TransactionLog = sequelize.define('TransactionLog', {
     allowNull: false,
     validate: {
       isIn: {
-        args: [['GET', 'POST', 'PUT', 'DELETE']],
-        msg: 'HTTP method must be GET, POST, PUT, or DELETE'
+        args: [['GET', 'POST', 'PUT', 'DELETE', 'HEAD']],
+        msg: 'HTTP method must be GET, POST, PUT, DELETE, or HEAD'
       }
     }
   },
