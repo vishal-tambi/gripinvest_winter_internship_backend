@@ -43,23 +43,38 @@ export default function Investments() {
   // Chart data preparation
   const typeDistribution = investments.reduce((acc, inv) => {
     const type = inv.product?.investment_type || 'other';
-    acc[type] = (acc[type] || 0) + inv.amount;
+    const amount = parseFloat(inv.amount) || 0;
+    acc[type] = (acc[type] || 0) + amount;
     return acc;
   }, {} as Record<string, number>);
 
-  const pieData = Object.entries(typeDistribution).map(([type, amount]) => ({
-    name: type.toUpperCase(),
-    value: amount,
-    color: getTypeColor(type),
-  }));
+  const pieData = Object.entries(typeDistribution)
+    .filter(([, amount]) => amount > 0)
+    .map(([type, amount]) => ({
+      name: type.toUpperCase(),
+      value: amount,
+      color: getTypeColor(type),
+    }));
 
   const monthlyData = investments.reduce((acc, inv) => {
-    const month = new Date(inv.invested_at).toLocaleString('default', { month: 'short' });
+    const investedDate = new Date(inv.invested_at);
+    if (isNaN(investedDate.getTime())) {
+      console.warn('Invalid date for investment:', inv.id, inv.invested_at);
+      return acc;
+    }
+
+    const month = investedDate.toLocaleString('default', { month: 'short' });
+    const amount = parseFloat(inv.amount) || 0;
+
+    if (amount <= 0) {
+      return acc;
+    }
+
     const existingMonth = acc.find(item => item.month === month);
     if (existingMonth) {
-      existingMonth.amount += inv.amount;
+      existingMonth.amount += amount;
     } else {
-      acc.push({ month, amount: inv.amount });
+      acc.push({ month, amount });
     }
     return acc;
   }, [] as Array<{ month: string; amount: number }>);
@@ -93,8 +108,16 @@ export default function Investments() {
     }
   };
 
-  const totalInvestment = investments.reduce((sum, inv) => sum + inv.amount, 0);
-  const totalExpectedReturn = investments.reduce((sum, inv) => sum + (inv.expected_return || 0), 0);
+  const totalInvestment = investments.reduce((sum, inv) => {
+    const amount = parseFloat(inv.amount) || 0;
+    return sum + amount;
+  }, 0);
+
+  const totalExpectedReturn = investments.reduce((sum, inv) => {
+    const expectedReturn = parseFloat(inv.expected_return) || 0;
+    return sum + expectedReturn;
+  }, 0);
+
   const profitLoss = totalExpectedReturn - totalInvestment;
 
   if (loading) {
@@ -386,7 +409,10 @@ export default function Investments() {
                             <Cell key={`cell-${index}`} fill={entry.color} />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Amount']} />
+                        <Tooltip formatter={(value) => {
+                          const num = Number(value);
+                          return [`$${isNaN(num) ? '0' : num.toLocaleString()}`, 'Amount'];
+                        }} />
                       </PieChart>
                     </ResponsiveContainer>
                   ) : (
@@ -415,7 +441,10 @@ export default function Investments() {
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="month" />
                         <YAxis />
-                        <Tooltip formatter={(value) => [`$${Number(value).toLocaleString()}`, 'Amount']} />
+                        <Tooltip formatter={(value) => {
+                          const num = Number(value);
+                          return [`$${isNaN(num) ? '0' : num.toLocaleString()}`, 'Amount'];
+                        }} />
                         <Bar dataKey="amount" fill="#3b82f6" />
                       </BarChart>
                     </ResponsiveContainer>
