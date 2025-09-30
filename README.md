@@ -33,6 +33,17 @@ A full-stack investment platform enabling users to browse, invest in, and manage
 - **Backend API**: [https://gripinvest-winter-internship-backend.onrender.com](https://gripinvest-winter-internship-backend.onrender.com)
 - **API Documentation**: Import `IntelliInvest-Hub-API.postman_collection.json` in Postman
 
+<img width="1919" height="914" alt="Screenshot 2025-09-30 174842" src="https://github.com/user-attachments/assets/34c06070-df65-47ee-ab59-4a69283429f5" />
+
+<img width="1919" height="916" alt="Screenshot 2025-09-30 175233" src="https://github.com/user-attachments/assets/fccf148a-77b8-4692-8702-d143398f75d8" />
+
+<img width="1917" height="908" alt="Screenshot 2025-09-30 175239" src="https://github.com/user-attachments/assets/8045bf95-f9bf-42ef-b11d-e32929504efa" />
+
+<img width="1368" height="450" alt="Screenshot 2025-09-30 175258" src="https://github.com/user-attachments/assets/726d6d7a-3923-47a1-a43a-47c2f80fed1e" />
+
+<img width="1919" height="910" alt="Screenshot 2025-09-30 175246" src="https://github.com/user-attachments/assets/cae0a9f1-6d8d-48f3-810a-a08eeca81d2d" />
+
+
 ## ⚡ Quick Start
 
 ### Prerequisites
