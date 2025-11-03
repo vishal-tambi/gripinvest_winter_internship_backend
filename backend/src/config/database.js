@@ -42,7 +42,6 @@ const dbConfig = process.env.NODE_ENV === 'development' && !process.env.FORCE_MY
   dialect: 'mysql',
   dialectOptions: {
     charset: 'utf8mb4',
-    collate: 'utf8mb4_unicode_ci',
   },
   pool: {
     min: parseInt(process.env.DB_POOL_MIN) || 0,
