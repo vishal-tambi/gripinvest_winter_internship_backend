@@ -19,7 +19,10 @@ const logger = winston.createLogger({
 });
 
 // Database configuration
-const dbConfig = process.env.NODE_ENV === 'development' && !process.env.FORCE_MYSQL ? {
+const isDev = process.env.NODE_ENV === 'development' && !process.env.FORCE_MYSQL;
+
+// -------- DEVELOPMENT MODE (SQLite) ----------
+const devConfig = {
   dialect: 'sqlite',
   storage: './database.sqlite',
   logging: (msg) => {
@@ -30,37 +33,48 @@ const dbConfig = process.env.NODE_ENV === 'development' && !process.env.FORCE_MY
   define: {
     underscored: true,
     freezeTableName: true,
-    charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci'
   }
-} : {
-  host: process.env.DB_HOST || 'localhost',
+};
+
+// -------- PRODUCTION MODE (Railway MySQL) ----------
+const prodConfig = {
+  host: process.env.DB_HOST,
   port: process.env.DB_PORT || 3306,
-  database: process.env.DB_NAME || 'investment_platform',
-  username: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'rootpassword',
+  database: process.env.DB_NAME,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+
   dialect: 'mysql',
+
   dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false
+    },
     charset: 'utf8mb4',
+    connectTimeout: 60000
   },
+
   pool: {
     min: parseInt(process.env.DB_POOL_MIN) || 0,
     max: parseInt(process.env.DB_POOL_MAX) || 5,
     acquire: parseInt(process.env.DB_POOL_ACQUIRE) || 30000,
     idle: parseInt(process.env.DB_POOL_IDLE) || 10000
   },
-  logging: (msg) => {
-    if (process.env.NODE_ENV === 'development') {
-      logger.debug(msg);
-    }
-  },
+
+  logging: false,
+
   define: {
     underscored: true,
     freezeTableName: true,
-    charset: 'utf8mb4',
     collate: 'utf8mb4_unicode_ci'
   }
 };
+
+
+// Choose config
+const dbConfig = isDev ? devConfig : prodConfig;
 
 // Create Sequelize instance
 const sequelize = new Sequelize(dbConfig);
@@ -72,8 +86,7 @@ const connectDB = async () => {
     logger.info('✅ MySQL database connection established successfully');
 
     if (process.env.NODE_ENV === 'development') {
-      // Sync database in development (create tables if they don't exist)
-      await sequelize.sync({ alter: false }); // Use alter: true carefully in development
+      await sequelize.sync({ alter: false });
       logger.info('✅ Database synchronized');
     }
   } catch (error) {
