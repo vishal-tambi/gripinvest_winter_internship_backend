@@ -88,6 +88,8 @@ const connectDB = async () => {
     if (process.env.NODE_ENV === 'development') {
       await sequelize.sync({ alter: false });
       logger.info('✅ Database synchronized');
+    }else{
+      await sequelize.sync({alter: true})
     }
   } catch (error) {
     logger.error('❌ Unable to connect to MySQL database:', error);
