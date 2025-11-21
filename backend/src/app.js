@@ -21,10 +21,38 @@ const PORT = process.env.PORT || 3001;
 
 // Basic middleware
 app.use(helmet());
+
+// CORS Configuration - UPDATED
+const allowedOrigins = process.env.CORS_ORIGINS 
+  ? process.env.CORS_ORIGINS.split(',') 
+  : [
+      'http://localhost:8080',
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'https://gripinvest-winter-internship-backen-one.vercel.app' // Add your Vercel URL
+    ];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:8080', 'http://localhost:5173'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, Postman, curl, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
 }));
+
+// Handle preflight requests
+app.options('*', cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -42,7 +70,8 @@ app.get('/api/health', async (req, res) => {
       data: {
         status: 'healthy',
         database: 'connected',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        corsOrigins: allowedOrigins // Helpful for debugging
       }
     });
   } catch (error) {
@@ -77,16 +106,30 @@ app.get('/', (req, res) => {
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: 'Route not found'
+    message: 'Route not found',
+    path: req.originalUrl
   });
 });
 
-// Basic error handler
+// Enhanced error handler
 app.use((error, req, res, next) => {
   console.error('Server error:', error);
+  
+  // CORS errors
+  if (error.message === 'Not allowed by CORS') {
+    return res.status(403).json({
+      success: false,
+      message: 'CORS policy: Origin not allowed',
+      origin: req.headers.origin
+    });
+  }
+  
   res.status(500).json({
     success: false,
-    message: 'Internal server error'
+    message: process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : error.message,
+    ...(process.env.NODE_ENV !== 'production' && { stack: error.stack })
   });
 });
 
@@ -101,6 +144,7 @@ const startServer = async () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📋 Health check: http://localhost:${PORT}/api/health`);
       console.log(`🔧 API base: http://localhost:${PORT}/api`);
+      console.log(`🌐 CORS enabled for:`, allowedOrigins);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
@@ -114,6 +158,17 @@ process.on('SIGINT', async () => {
   const { disconnectDB } = require('./config/database');
   await disconnectDB();
   process.exit(0);
+});
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (error) => {
+  console.error('❌ Unhandled Rejection:', error);
+  process.exit(1);
 });
 
 // Start the server
